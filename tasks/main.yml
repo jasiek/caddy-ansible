@@ -59,11 +59,12 @@
 
 - name: Check if systemd is running
   stat: path=/run/systemd/system
+  when: caddy_init_system == 'system'
   register: systemd
 
 - name: Upstart service
   template: src={{ item }} dest=/etc/init/caddy.conf mode=0644
-  when: not systemd.stat.exists
+  when: (caddy_init_system == 'system') and (not systemd.stat.exists)
   with_first_found:
     - "caddy.conf.{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}"
     - "caddy.conf.{{ ansible_distribution | lower }}-{{ ansible_distribution_version }}"
@@ -72,7 +73,7 @@
 
 - name: Systemd service
   template: src=caddy.service dest=/etc/systemd/system/caddy.service mode=0755
-  when: systemd.stat.exists
+  when: (caddy_init_system == 'system') and systemd.stat.exists
   notify: Reload systemd service file
 
 - name: Check if the binary can bind to TCP port <1024
@@ -89,3 +90,4 @@
 
 - name: Start Caddy service
   service: name=caddy state=started enabled=yes
+  when: caddy_init_system == 'system'
