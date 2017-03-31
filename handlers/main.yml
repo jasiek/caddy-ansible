@@ -3,6 +3,12 @@
 - name: Restart Caddy
   service: name=caddy state=restarted
   when: caddy_init_system == 'system'
+  listen: "Restart Caddy"
+
+- name: Restart Caddy
+  command: sv restart {{ caddy_runit_name }}
+  when: caddy_init_system == 'runit'
+  listen: "Restart Caddy"
 
 - name: Reload systemd service file
   command: systemctl daemon-reload

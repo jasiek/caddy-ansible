@@ -90,3 +90,7 @@
 - name: Start Caddy service
   service: name=caddy state=started enabled=yes
   when: caddy_init_system == 'system'
+
+- name: Start Caddy service
+  command: sv up {{ caddy_runit_name }}
+  when: caddy_init_system == 'runit'
